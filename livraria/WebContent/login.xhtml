@@ -7,16 +7,12 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <ui:composition template="_template.xhtml">
-	 
+
 	<ui:define name="titulo">
 		<p:outputPanel>Login</p:outputPanel>
 	</ui:define>
 
 	<ui:define name="conteudo">
-	<f:metadata>
-	<f:event type="preRenderView" listener="#{loginBean.loginComCookie}"/>
-	
-	</f:metadata>
 
 		<p:messages globalOnly="true" />
 
@@ -27,14 +23,14 @@
 					<h:panelGrid columns="2">
 
 						<p:outputLabel value="Email:" for="email" />
-						<p:inputText id="email" value="#{loginBean.usuarioLogin.email}"
+						<p:inputText id="email" value="#{loginBean.usuario.email}"
 							required="true">
 							<f:passThroughAttribute name="type" value="email" />
 						</p:inputText>
 
 
 						<p:outputLabel value="Senha:" for="senha" />
-						<p:password id="senha" value="#{loginBean.usuarioLogin.senha}"
+						<p:password id="senha" value="#{loginBean.usuario.senha}"
 							feedback="true" required="true" />
 
 						<p:commandButton value="Efetue Login"

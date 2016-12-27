@@ -3,9 +3,6 @@ package br.com.prova.livraria.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
 import br.com.prova.livraria.modelo.Autor;
 import br.com.prova.livraria.modelo.Livro;
 
@@ -18,15 +15,18 @@ public class AutorDao {
 	}
 
 	public void drop() {
+		// TODO Auto-generated method stub
 		LSAutor.clear();
 	}
 
 	public List<Autor> listaTodos() {
+		// TODO Auto-generated method stub
 		return LSAutor;
 	}
 
 	public Autor buscaPorId(Integer autorId) {
 
+		// TODO Auto-generated method stub
 		for (Autor autor : LSAutor) {
 			if (autorId == autor.getId()) {
 				return autor;
@@ -38,44 +38,17 @@ public class AutorDao {
 	}
 
 	public void remove(Autor autor) {
-		LSAutor.remove(autor);
-
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void adiciona(Autor autor) {
-		if (!verificaDuplicidade(autor)) {
-			autor.setId(LSAutor.size() + 1);
-			autor.setQtdLivros(0);
-			LSAutor.add(autor);
-		} else {
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Autor já Cadastrado", "Autor já Cadastrado"));
-		}
-
-	}
-
-	private boolean verificaDuplicidade(Autor autor) {
-		for (Autor a : LSAutor) {
-			if (a.getNome().equals(autor.getNome()))
-				return true;
-		}
-		return false;
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void atualiza(Autor autor) {
-		LSAutor.set(autor.getId() - 1, autor);
-	}
-
-	public void contarLivros() {
-		for (Autor a : AutorDao.LSAutor) {
-			for (Livro l : LivroDao.LSLivro) {
-				for (Autor al : l.getAutores()) {
-					if (a.getNome().equals(al.getNome())) {
-						a.setQtdLivros(a.getQtdLivros() + 1);
-					}
-				}
-			}
-		}
+		// TODO Auto-generated method stub
+		
 	}
 }

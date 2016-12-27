@@ -1,50 +1,39 @@
 package br.com.prova.livraria.dao;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+
+import br.com.prova.livraria.modelo.Autor;
+import br.com.prova.livraria.modelo.Livro;
 import br.com.prova.livraria.modelo.Usuario;
 
 public class UsuarioDao {
-
+	
 	public static ArrayList<Usuario> LSUsuario = new ArrayList<Usuario>();
 
-	public Usuario existe(Usuario usuario) {
-
+	public boolean existe(Usuario usuario) {
+		
 		for (Usuario u : LSUsuario) {
-			if (u.getEmail().equals(usuario.getEmail()) && u.getSenha().equals(usuario.getSenha())) {
-				return u;
+			if(usuario.getEmail().equals(u.getEmail()) && usuario.getSenha().equals(u.getSenha()) ){
+				
+				return true;			
 			}
 		}
-		return null;
+		
+		return false;
+				
 	}
-
-	public void pesist(Usuario usuario) {
-		usuario.setId(LSUsuario.size() + 1);
+	
+	
+	public void pesist(Usuario usuario){
 		LSUsuario.add(usuario);
 	}
 
-	public void atualiza(Usuario usuario) {
-		LSUsuario.set(usuario.getId() - 1, usuario);
-	}
-
 	public void drop() {
+		// TODO Auto-generated method stub
 		LSUsuario.clear();
-	}
-
-	public Usuario buscaPorId(Integer usuarioId) {
-
-		for (Usuario usuario : LSUsuario) {
-			if (usuarioId == usuario.getId()) {
-				return usuario;
-			}
-		}
-
-		return null;
-
-	}
-
-	public List<Usuario> listaTodos() {
-		return LSUsuario;
 	}
 }

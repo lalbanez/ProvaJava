@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="_template.xhtml">
+
+
+	<ui:define name="titulo">
+		<p:outputPanel>Novo Usuário</p:outputPanel>
+	</ui:define>
+
+	<ui:define name="conteudo">
+		<h:form id="frmUsuario">
+			<p:fieldset legend="Dados do Usuário">
+				<p:panelGrid columns="2" style="margin-bottom:30px" id="frmDados">
+
+					<p:outputLabel value="Nome:" for="nome" />
+					<p:inputText id="nome" required="true"
+						requiredMessage="Nome é obrigatório"
+						value="#{usuarioBean.usuario.nome}" />
+
+
+					<p:outputLabel value="E-mail:" for="email" />
+					<p:inputText id="email" required="true"
+						value="#{usuarioBean.usuario.email}"
+						validatorMessage="Email inválido">
+						<f:attribute name="type" value="email" />
+						<f:validateRegex pattern=".+@.+" />
+					</p:inputText>
+
+
+					<p:outputLabel value="Perfil" for="perfil" />
+					<p:selectOneMenu id="perfil" value="#{usuarioBean.usuario.perfil}"
+						required="true" requiredMessage="Perfil é obrigatório"
+						style="width: 85%">
+						<f:selectItem itemLabel="Selecione" />
+						<f:selectItems value="#{usuarioBean.perfil}" var="perfil"
+							itemLabel="#{perfil.descricao}" itemValue="#{perfil}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel for="pwd1" value="Senha" />
+					<p:password id="pwd1" match="pwd2" required="true"
+						readonly="Senha Obrigatória" feedback="true"
+						value="#{usuarioBean.usuario.senha}" promptLabel="Segurança"
+						weakLabel="Fraca" goodLabel="Boa" strongLabel="Forte"
+						validatorMessage="As senhas devem ser iguais" />
+
+					<p:outputLabel for="pwd2" value="Repita a senha" />
+					<p:password id="pwd2" required="true" />
+
+				</p:panelGrid>
+
+				<p:commandButton
+					update=":tblUsuario:tabelaUsuario :frmUsuario:frmDados"
+					value="Gravar" action="#{usuarioBean.gravar}" />
+			</p:fieldset>
+		</h:form>
+
+		<h:form id="tblUsuario">
+			<p:panel style="margin-top:20px">
+				<p:dataTable value="#{usuarioBean.usuarios}" var="usuario"
+					id="tabelaUsuario" paginator="true" rows="5"
+					paginatorPosition="bottom">
+
+					<f:facet name="header">Usuários</f:facet>
+					<p:column headerText="Nome" sortBy="#{usuario.nome}"
+						filterBy="#{usuario.nome}" filterMatchMode="startsWith">
+						<h:outputText value="#{usuario.nome}" />
+					</p:column>
+
+					<p:column headerText="E-mail" sortBy="#{usuario.email}">
+						<h:outputText value="#{usuario.email}" />
+					</p:column>
+
+					<p:column headerText="Perfil" sortBy="#{usuario.perfil}">
+						<h:outputText value="#{usuario.perfil}" />
+					</p:column>
+
+					<p:column width="40">
+						<p:commandButton icon="fa fa-edit" update=":frmUsuario:frmDados"
+							title="Editar" immediate="true">
+							<f:setPropertyActionListener value="#{usuario}"
+								target="#{usuarioBean.usuario}" />
+						</p:commandButton>
+					</p:column>
+
+					<p:column width="40">
+						<p:commandButton icon="fa fa-remove" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@form"
+							immediate="true" update=":tblUsuario:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener value="#{usuario}"
+								target="#{usuarioBean.usuarioSelecionado}" />
+						</p:commandButton>
+					</p:column>
+
+
+				</p:dataTable>
+			</p:panel>
+			<p:confirmDialog header="Exclusão de Usuário"
+				message="Tem certeza que deseja excluir o usuário #{usuarioBean.usuarioSelecionado.nome}?"
+				widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				<p:button value="Não"
+					onclick="PF('confirmacaoExclusao').hide(); return false;" />
+				<p:commandButton value="Sim" action="#{usuarioBean.excluir}"
+					oncomplete="PF('confirmacaoExclusao').hide();" process="@this"
+					update=":tblUsuario:tabelaUsuario" />
+			</p:confirmDialog>
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

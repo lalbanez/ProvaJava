@@ -1,0 +1,16 @@
+@CHARSET "UTF-8";
+
+.custompanelgrid {
+	border: none;
+	
+}
+
+.custompanelgrid tr {
+	border: none;
+	
+}
+.custompanelgrid td{
+	background: white;
+	border: none !important;
+	
+}

@@ -3,66 +3,103 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:p="http://primefaces.org/ui" 
+	xmlns:p="http://primefaces.org/ui"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-	<ui:composition template="_template.xhtml">
-	
-		<f:metadata>
-			<f:viewParam name="autorId" value="#{autorBean.autorId}" />
-			<f:viewAction action="#{autorBean.carregarAutorPelaId}" if="#{param.autorId != null}" />
-		</f:metadata>
+<ui:composition template="_template.xhtml">
 
-		<ui:define name="titulo">
-				<p:outputPanel>Novo Autor</p:outputPanel>
-		</ui:define>
+	<f:metadata>
+		<f:viewParam name="autorId" value="#{autorBean.autorId}" />
+		<f:viewAction action="#{autorBean.carregarAutorPelaId}"
+			if="#{param.autorId != null}" />
+	</f:metadata>
 
-		<ui:define name="conteudo">
-			<h:form id="autor">
-				<p:fieldset legend="Dados do Autor">
-					<h:panelGrid columns="3">
+	<ui:define name="titulo">
+		<p:outputPanel>Novo Autor</p:outputPanel>
+	</ui:define>
 
-						<p:outputLabel value="Nome:" for="nome" />
-						<p:inputText id="nome" value="#{autorBean.autor.nome}"
-							required="true">
-							<f:validateLength minimum="5" />
-							<f:ajax event="blur" render="messageNome" />
-						</p:inputText>
-						<p:message for="nome" id="messageNome" />
-						
-						<p:outputLabel value="Email:" for="email" />
-						<p:inputText id="email" value="#{autorBean.autor.email}" required="true" validatorMessage="Email inválido">
-							<f:attribute name="type" value="email" />
-							<f:passThroughAttribute name="placeholder" value="Email do autor" />
-							<f:validateRegex pattern=".+@.+" />
-							<f:ajax event="blur" render="messageEmail" />
-						</p:inputText> 
+	<ui:define name="conteudo">
+		<h:form id="frmAutor">
+			<p:fieldset legend="Dados do Autor">
+				<h:panelGrid columns="2">
 
-						<p:message for="email" id="messageEmail" />
+					<p:outputLabel value="Nome:" for="nome" />
+					<p:inputText id="nome" value="#{autorBean.autor.nome}"
+						required="true">
+						<f:validateLength minimum="5" />
+						<f:ajax event="blur" render="messageNome" />
+					</p:inputText>
 
-						<p:commandButton value="Gravar" action="#{autorBean.gravar}" process="@form" update="@form :formTabelaAutors" />
-					</h:panelGrid>
-				</p:fieldset>
-			</h:form>
-			
-			<h:form id="formTabelaAutors">
-				<p:dataList value="#{autorBean.autores}" var="autor" type="definition">
-					<f:facet name="header">
-						Autores
-					</f:facet>
-					
-					<p:commandButton icon="fa fa-fw fa-edit" update=":autor">
-						<f:setPropertyActionListener value="#{autor}" target="#{autorBean.autor}" />
-					</p:commandButton>
-					
-					<p:commandButton icon="fa fa-fw fa-remove" action="#{autorBean.remover(autor)}" 
-						update="@form" />
-						
-					#{autor.nome} - #{autor.email}
-				</p:dataList>
-			</h:form>		
-		</ui:define>
+					<p:outputLabel value="Email:" for="email" />
+					<p:inputText id="email" value="#{autorBean.autor.email}"
+						required="true" validatorMessage="Email inválido">
+						<f:attribute name="type" value="email" />
+						<f:passThroughAttribute name="placeholder" value="Email do autor" />
+						<f:validateRegex pattern=".+@.+" />
+						<f:ajax event="blur" render="messageEmail" />
+					</p:inputText>
 
-	</ui:composition>
+					<p:commandButton value="Gravar" update="frmAutor formTabelaAutors" action="#{autorBean.gravar}" />
+				</h:panelGrid>
+			</p:fieldset>
+		</h:form>
+
+
+
+		<h:form id="formTabelaAutors">
+			<p:panel style="margin-top:20px">
+				<p:dataTable value="#{autorBean.autores}" var="autor"
+					id="tabelaAutor" paginator="true" rows="5"
+					paginatorPosition="bottom">
+					<f:facet name="header">Autores</f:facet>
+					<p:column headerText="Nome" sortBy="#{autor.nome}"
+						filterBy="#{autor.nome}" filterMatchMode="startsWith">
+						<h:outputText value="#{autor.nome}" />
+					</p:column>
+
+					<p:column headerText="E-mail" sortBy="#{autor.email}">
+						<h:outputText value="#{autor.email}" />
+					</p:column>
+
+					<p:column headerText="Qtd. Livros" sortBy="#{autor.qtdLivros}">
+						<h:outputText value="#{autor.qtdLivros}" />
+					</p:column>
+
+					<p:column width="40">
+						<p:commandButton icon="fa fa-edit"
+							update="frmAutor" title="Editar" immediate="true">
+							<f:setPropertyActionListener value="#{autor}"
+								target="#{autorBean.autor}" />
+						</p:commandButton>
+					</p:column>
+
+					<p:column width="40">
+						<p:commandButton icon="fa fa-remove" title="Excluir"
+							oncomplete="PF('confirmacaoExclusao').show()" process="@form"
+							immediate="true"
+							update=":formTabelaAutors:confirmacaoExclusaoDialog">
+							<f:setPropertyActionListener value="#{autor}"
+								target="#{autorBean.autorSelecionado}" />
+						</p:commandButton>
+					</p:column>
+
+
+				</p:dataTable>
+			</p:panel>
+			<p:confirmDialog header="Exclusão de Autores"
+				message="Tem certeza que deseja excluir o autor #{autorBean.autorSelecionado.nome}?"
+				widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				<p:button value="Não"
+					onclick="PF('confirmacaoExclusao').hide(); return false;" />
+				<p:commandButton value="Sim" action="#{autorBean.remover}"
+					oncomplete="PF('confirmacaoExclusao').hide();" process="@this"
+					update=":formTabelaAutors:tabelaAutor" />
+			</p:confirmDialog>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
 
 </html>

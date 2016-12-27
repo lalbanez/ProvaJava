@@ -16,7 +16,8 @@ public class Autor implements Serializable {
 	private Integer id;
 	private String nome;
 	private String email;
-	
+	private Integer qtdLivros;
+
 	public String getEmail() {
 		return email;
 	}
@@ -39,6 +40,14 @@ public class Autor implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getQtdLivros() {
+		return qtdLivros;
+	}
+
+	public void setQtdLivros(Integer qtdLivros) {
+		this.qtdLivros = qtdLivros;
 	}
 
 }

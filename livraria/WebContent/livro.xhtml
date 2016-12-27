@@ -6,6 +6,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
+
 <ui:composition template="_template.xhtml">
 
 	<f:metadata>
@@ -20,19 +21,19 @@
 	</ui:define>
 
 	<ui:define name="conteudo">
-		<h:form>
+		<h:form id="frmLivro">
 
-			<p:messages id="messages" />
+			<p:messages id="messages" closable="true" />
 
 			<p:fieldset legend="Dados do Livro">
-				<p:panelGrid columns="2">
+				<p:panelGrid columns="2" id="frmDadosLivro">
 
 					<p:outputLabel value="Titulo:" for="titulo" />
 					<p:inputText id="titulo" value="#{livroBean.livro.titulo}"
 						required="true" requiredMessage="Título obrigatório"
 						validatorMessage="Título não pode ser superior a 40">
 						<f:validateLength maximum="40" />
-						<f:ajax event="blur" render="messages" />
+						<f:ajax event="blur" render="@form" listener="#{livroBean.exibeDadosAutor}"/>
 					</p:inputText>
 
 					<p:outputLabel value="ISBN:" for="isbn" />
@@ -43,6 +44,7 @@
 					<p:outputLabel value="Preço:" for="preco" />
 					<p:inputText id="preco" value="#{livroBean.livro.preco}" />
 
+
 					<p:outputLabel value="Data de Lançamento:" for="dataLancamento" />
 					<p:calendar id="dataLancamento"
 						value="#{livroBean.livro.dataLancamento.time}"
@@ -52,24 +54,24 @@
 
 			</p:fieldset>
 
-			<p:fieldset legend="Dados do Autor">
-
+			<p:fieldset legend="Dados do Autor" id="dadosAutor"
+				style="margin-top: 20px" rendered="#{livroBean.showAutor || not empty livroBean.autoresDoLivro}">
 				<p:panelGrid columns="4">
-					<p:outputLabel value="Selecione Autor:" for="autor" />
+					<p:outputLabel value="Autor:" for="autor" />
 					<p:selectOneMenu value="#{livroBean.autorId}" id="autor">
 						<f:selectItems value="#{livroBean.autores}" var="autor"
 							itemLabel="#{autor.nome}" itemValue="#{autor.id}" />
 					</p:selectOneMenu>
-					<p:commandButton value="Gravar Autor"
+					<p:commandButton icon="fa fa-plus-square" title="Adicionar autor"
 						action="#{livroBean.gravarAutor}" process="@this autor"
 						update="tabelaAutores" />
 
 					<p:commandLink value="ou cadastrar novo autor"
 						action="#{livroBean.formAutor}" immediate="true" update="@all" />
 				</p:panelGrid>
-
 				<p:dataTable value="#{livroBean.autoresDoLivro}" var="autor"
-					id="tabelaAutores" emptyMessage="Nenhum autor">
+					style="margin-top: 10px" id="tabelaAutores"
+					emptyMessage="Nenhum autor">
 					<p:column>
 						<h:outputText value="#{autor.nome}" />
 					</p:column>
@@ -79,25 +81,26 @@
 							update="tabelaAutores" process="@this" />
 					</p:column>
 				</p:dataTable>
-			</p:fieldset>
-			<p:fieldset >
-				<p:panelGrid columns="1">
-					<p:commandButton value="Gravar" action="#{livroBean.gravar}"
-						process="@form" update="@form :formTabelaLivros:tabelaLivros" />
 
-				</p:panelGrid>
 			</p:fieldset>
-
+			<p:panelGrid columns="1"
+				style="width: 100%; text-align:center; margin-top: 10px"
+				styleClass="custompanelgrid">
+				<p:commandButton value="Gravar" action="#{livroBean.gravar}"
+					style="width:250px"
+					update=":formTabelaLivros:tabelaLivros frmLivro" />
+			</p:panelGrid>
 		</h:form>
 
 
 		<h:form id="formTabelaLivros">
 			<p:dataTable value="#{livroBean.livros}" var="livro"
-				id="tabelaLivros" paginator="true" rows="5">
+				id="tabelaLivros" paginator="true" rows="5"
+				paginatorPosition="bottom" style="margin-top:20px">
 
 				<f:facet name="header">Livros</f:facet>
 				<p:column headerText="Título" sortBy="#{livro.titulo}"
-					filterBy="#{livro.titulo}" filterMatchMode="startsWith">
+					filterBy="#{livro.titulo}" filterMatchMode="startsWith" width="350">
 					<h:outputText value="#{livro.titulo}" />
 				</p:column>
 
@@ -119,15 +122,40 @@
 					</h:outputText>
 				</p:column>
 
-				<p:column headerText="Alterar">
-					<h:commandLink value="altera" action="#{livroBean.carregar(livro)}" />
+				<p:column width="40">
+					<p:commandButton icon="fa fa-edit"
+						update=":frmLivro:frmDadosLivro frmLivro"
+						title="Editar" immediate="true">
+						<f:setPropertyActionListener value="#{livro}"
+							target="#{livroBean.livro}" />
+					</p:commandButton>
 				</p:column>
 
-				<p:column headerText="Remover">
-					<h:commandLink value="remove" action="#{livroBean.remover(livro)}" />
+
+				<p:column width="40">
+					<p:commandButton icon="fa fa-remove" title="Excluir"
+						oncomplete="PF('confirmacaoExclusao').show()" process="@form"
+						immediate="true"
+						update=":formTabelaLivros:confirmacaoExclusaoDialog">
+						<f:setPropertyActionListener value="#{livro}"
+							target="#{livroBean.livroSelecionado}" />
+					</p:commandButton>
 				</p:column>
 
 			</p:dataTable>
+
+
+			<p:confirmDialog header="Exclusão de Usuário"
+				message="Tem certeza que deseja excluir o livro #{livroBean.livroSelecionado.titulo}?"
+				widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+				<p:button value="Não"
+					onclick="PF('confirmacaoExclusao').hide(); return false;" />
+				<p:commandButton value="Sim" action="#{livroBean.remover}"
+					oncomplete="PF('confirmacaoExclusao').hide();" process="@this"
+					update=":formTabelaLivros:tabelaLivros" />
+			</p:confirmDialog>
+
+
 		</h:form>
 	</ui:define>
 </ui:composition>
